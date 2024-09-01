@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/CleanCodeLearning/static/css/main.1be83867.css",
+    "main.js": "/CleanCodeLearning/static/js/main.59305314.js",
+    "static/js/453.6b4535ba.chunk.js": "/CleanCodeLearning/static/js/453.6b4535ba.chunk.js",
+    "index.html": "/CleanCodeLearning/index.html",
+    "main.1be83867.css.map": "/CleanCodeLearning/static/css/main.1be83867.css.map",
+    "main.59305314.js.map": "/CleanCodeLearning/static/js/main.59305314.js.map",
+    "453.6b4535ba.chunk.js.map": "/CleanCodeLearning/static/js/453.6b4535ba.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1be83867.css",
+    "static/js/main.59305314.js"
+  ]
+}
