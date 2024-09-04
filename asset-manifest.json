@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/CleanCodeLearning/static/css/main.e8272286.css",
-    "main.js": "/CleanCodeLearning/static/js/main.06e17725.js",
-    "static/js/453.6b4535ba.chunk.js": "/CleanCodeLearning/static/js/453.6b4535ba.chunk.js",
+    "main.css": "/CleanCodeLearning/static/css/main.f95d555f.css",
+    "main.js": "/CleanCodeLearning/static/js/main.f5e25441.js",
+    "static/js/453.e8125fc2.chunk.js": "/CleanCodeLearning/static/js/453.e8125fc2.chunk.js",
     "index.html": "/CleanCodeLearning/index.html",
-    "main.e8272286.css.map": "/CleanCodeLearning/static/css/main.e8272286.css.map",
-    "main.06e17725.js.map": "/CleanCodeLearning/static/js/main.06e17725.js.map",
-    "453.6b4535ba.chunk.js.map": "/CleanCodeLearning/static/js/453.6b4535ba.chunk.js.map"
+    "main.f95d555f.css.map": "/CleanCodeLearning/static/css/main.f95d555f.css.map",
+    "main.f5e25441.js.map": "/CleanCodeLearning/static/js/main.f5e25441.js.map",
+    "453.e8125fc2.chunk.js.map": "/CleanCodeLearning/static/js/453.e8125fc2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e8272286.css",
-    "static/js/main.06e17725.js"
+    "static/css/main.f95d555f.css",
+    "static/js/main.f5e25441.js"
   ]
 }
