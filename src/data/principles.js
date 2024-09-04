@@ -1,18 +1,26 @@
 export const principles = [
     {
         id: 1,
-        title: 'Meaningful Names',
+        title: 'Meaningful names',
         content:
             'Use intention-revealing names. Choose names that reflect the purpose of the variable, function, or class.',
         before: `// Bad example
-int d; // elapsed time in days
-if (d > 30) {
-  // do something
+public class Example {
+    public void process() {
+        int d; // elapsed time in days
+        if (d > 30) {
+            // do something
+        }
+    }
 }`,
         after: `// Good example
-int elapsedTimeInDays;
-if (elapsedTimeInDays > 30) {
-  // do something
+public class Example {
+    public void process() {
+        int elapsedTimeInDays;
+        if (elapsedTimeInDays > 30) {
+            // do something
+        }
+    }
 }`,
     },
     {
@@ -21,64 +29,77 @@ if (elapsedTimeInDays > 30) {
         content:
             'Keep functions small and focused on a single task. Aim for functions that are no more than 20 lines long.',
         before: `// Bad example
-function processData(data) {
-  // 100 lines of code doing multiple things
-  // Validation
-  // Processing
-  // Saving
-  // Reporting
+public class DataProcessor {
+    public void processData(Data data) {
+        // 100 lines of code doing multiple things
+        // Validation
+        // Processing
+        // Saving
+        // Reporting
+    }
 }`,
         after: `// Good example
-function processData(data) {
-  if (isValid(data)) {
-    const processedData = transform(data);
-    save(processedData);
-    generateReport(processedData);
-  }
-}
+public class DataProcessor {
+    public void processData(Data data) {
+        if (isValid(data)) {
+            Data processedData = transform(data);
+            save(processedData);
+            generateReport(processedData);
+        }
+    }
 
-function isValid(data) {
-  // Validation logic
-}
+    private boolean isValid(Data data) {
+        // Validation logic
+        return true;
+    }
 
-function transform(data) {
-  // Transformation logic
-}
+    private Data transform(Data data) {
+        // Transformation logic
+        return data;
+    }
 
-function save(data) {
-  // Saving logic
-}
+    private void save(Data data) {
+        // Saving logic
+    }
 
-function generateReport(data) {
-  // Reporting logic
+    private void generateReport(Data data) {
+        // Reporting logic
+    }
 }`,
     },
     {
         id: 3,
         title: 'Comments',
         content: 'Use comments to explain intent and clarify complex logic, not to restate the obvious.',
-        before: `// Calculate age
-int age = currentYear - birthYear;
+        before: `public class User {
+    // Calculate age
+    public int calculateAge(int currentYear, int birthYear) {
+        return currentYear - birthYear;
+    }
 
-// Check if user is eligible for discount
-if (user.totalPurchases > 1000 && user.membershipLevel === 'gold') {
-  // Apply 10% discount
-  price = price * 0.9;
+    // Check if user is eligible for discount
+    public boolean isEligibleForDiscount(User user) {
+        if (user.getTotalPurchases() > 1000 && user.getMembershipLevel().equals("gold")) {
+            // Apply 10% discount
+            return true;
+        }
+        return false;
+    }
 }`,
-        after: `int age = currentYear - birthYear;
+        after: `public class User {
+    public int calculateAge(int currentYear, int birthYear) {
+        return currentYear - birthYear;
+    }
 
-// Users with over $1000 in purchases and gold membership get a 10% discount
-if (isEligibleForDiscount(user)) {
-  price = applyDiscount(price);
-}
+    // Users with over $1000 in purchases and gold membership get a 10% discount
+    public boolean isEligibleForDiscount(User user) {
+        return user.getTotalPurchases() > 1000 && user.getMembershipLevel().equals("gold");
+    }
 
-function isEligibleForDiscount(user) {
-  return user.totalPurchases > 1000 && user.membershipLevel === 'gold';
-}
-
-function applyDiscount(price) {
-  const DISCOUNT_RATE = 0.1;
-  return price * (1 - DISCOUNT_RATE);
+    public double applyDiscount(double price) {
+        final double DISCOUNT_RATE = 0.1;
+        return price * (1 - DISCOUNT_RATE);
+    }
 }`,
     },
     {
@@ -232,89 +253,71 @@ public class DiscountCalculator {
         title: 'Liskov Substitution Principle',
         content:
             'Objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.',
-        before: `public class Rectangle {
-    protected int width;
-    protected int height;
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getArea() {
-        return width * height;
+        before: `// Bad example - violates LSP
+public class Bird {
+    public void fly() {
+        System.out.println("I can fly");
     }
 }
 
-public class Square extends Rectangle {
+public class Ostrich extends Bird {
     @Override
-    public void setWidth(int width) {
-        super.setWidth(width);
-        super.setHeight(width);
-    }
-
-    @Override
-    public void setHeight(int height) {
-        super.setWidth(height);
-        super.setHeight(height);
+    public void fly() {
+        throw new UnsupportedOperationException("I can't fly");
     }
 }
 
-public class Main {
-    public static void printArea(Rectangle rectangle) {
-        rectangle.setWidth(4);
-        rectangle.setHeight(5);
-        System.out.println(rectangle.getArea()); // Expected: 20
+public class BirdTest {
+    public static void makeBirdFly(Bird bird) {
+        bird.fly();
     }
 
     public static void main(String[] args) {
-        printArea(new Rectangle()); // Outputs: 20
-        printArea(new Square()); // Outputs: 25 (violates LSP)
+        Bird sparrow = new Bird();
+        Bird ostrich = new Ostrich();
+
+        makeBirdFly(sparrow); // Works fine
+        makeBirdFly(ostrich); // Throws an exception, violating LSP
     }
 }`,
-        after: `public abstract class Shape {
-    public abstract int getArea();
+        after: `// Good example - adheres to LSP
+public abstract class Animal {
+    public abstract void move();
 }
 
-public class Rectangle extends Shape {
-    private int width;
-    private int height;
-
-    public Rectangle(int width, int height) {
-        this.width = width;
-        this.height = height;
+public class FlyingAnimal extends Animal {
+    public void fly() {
+        System.out.println("I can fly");
     }
 
     @Override
-    public int getArea() {
-        return width * height;
+    public void move() {
+        fly();
     }
 }
 
-public class Square extends Shape {
-    private int side;
-
-    public Square(int side) {
-        this.side = side;
+public class RunningAnimal extends Animal {
+    public void run() {
+        System.out.println("I can run");
     }
 
     @Override
-    public int getArea() {
-        return side * side;
+    public void move() {
+        run();
     }
 }
 
-public class Main {
-    public static void printArea(Shape shape) {
-        System.out.println(shape.getArea());
+public class AnimalTest {
+    public static void makeAnimalMove(Animal animal) {
+        animal.move();
     }
 
     public static void main(String[] args) {
-        printArea(new Rectangle(4, 5)); // Outputs: 20
-        printArea(new Square(5)); // Outputs: 25
+        Animal bird = new FlyingAnimal();
+        Animal ostrich = new RunningAnimal();
+
+        makeAnimalMove(bird);    // Outputs: I can fly
+        makeAnimalMove(ostrich); // Outputs: I can run
     }
 }`,
     },
@@ -368,79 +371,103 @@ public class Robot implements Workable {
         content:
             'High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.',
         before: `class EmailSender {
-  sendEmail(message) {
-    // Send email logic
-  }
+    public void sendEmail(String message) {
+        // Send email logic
+    }
 }
 
 class Notifier {
-  constructor() {
-    this.emailSender = new EmailSender();
-  }
+    private EmailSender emailSender;
 
-  notify(message) {
-    this.emailSender.sendEmail(message);
-  }
+    public Notifier() {
+        this.emailSender = new EmailSender();
+    }
+
+    public void notify(String message) {
+        this.emailSender.sendEmail(message);
+    }
 }`,
         after: `interface MessageSender {
-  sendMessage(message: string): void;
+    void sendMessage(String message);
 }
 
 class EmailSender implements MessageSender {
-  sendMessage(message: string) {
-    // Send email logic
-  }
+    public void sendMessage(String message) {
+        // Send email logic
+    }
 }
 
 class SMSSender implements MessageSender {
-  sendMessage(message: string) {
-    // Send SMS logic
-  }
+    public void sendMessage(String message) {
+        // Send SMS logic
+    }
 }
 
 class Notifier {
-  constructor(private messageSender: MessageSender) {}
+    private MessageSender messageSender;
 
-  notify(message: string) {
-    this.messageSender.sendMessage(message);
-  }
+    public Notifier(MessageSender messageSender) {
+        this.messageSender = messageSender;
+    }
+
+    public void notify(String message) {
+        this.messageSender.sendMessage(message);
+    }
 }
 
 // Usage
-const emailNotifier = new Notifier(new EmailSender());
-const smsNotifier = new Notifier(new SMSSender());`,
+class Main {
+    public static void main(String[] args) {
+        Notifier emailNotifier = new Notifier(new EmailSender());
+        Notifier smsNotifier = new Notifier(new SMSSender());
+    }
+}`,
     },
     {
         id: 10,
         title: 'Error Handling',
         content: 'Use exceptions for error handling instead of return codes. Catch exceptions at the appropriate level.',
         before: `// Bad example
-function divide(a, b) {
-  if (b === 0) {
-    return -1; // Error code for division by zero
-  }
-  return a / b;
+public class Calculator {
+    public int divide(int a, int b) {
+        if (b == 0) {
+            return -1; // Error code for division by zero
+        }
+        return a / b;
+    }
 }
 
-const result = divide(10, 0);
-if (result === -1) {
-  console.log("Error: Division by zero");
-} else {
-  console.log("Result:", result);
+public class Main {
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        int result = calc.divide(10, 0);
+        if (result == -1) {
+            System.out.println("Error: Division by zero");
+        } else {
+            System.out.println("Result: " + result);
+        }
+    }
 }`,
         after: `// Good example
-function divide(a, b) {
-  if (b === 0) {
-    throw new Error("Division by zero");
-  }
-  return a / b;
+public class Calculator {
+    public int divide(int a, int b) throws ArithmeticException {
+        if (b == 0) {
+            throw new ArithmeticException("Division by zero");
+        }
+        return a / b;
+    }
 }
 
-try {
-  const result = divide(10, 0);
-  console.log("Result:", result);
-} catch (error) {
-  console.error("Error:", error.message);
+public class Main {
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        try {
+            int result = calc.divide(10, 0);
+            System.out.println("Result: " + result);
+        } catch (ArithmeticException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 }`,
     },
     {
@@ -448,20 +475,22 @@ try {
         title: 'Code Formatting',
         content: 'Maintain consistent code formatting. Use automated tools to enforce style guidelines.',
         before: `// Bad example
-function badlyFormattedFunction(param1,param2){
-if(param1>param2){
-return true;
-}
-else{
-return false;
-}}`,
+public class BadlyFormattedClass{
+public void badlyFormattedMethod(int param1,String param2){
+if(param1>0){
+System.out.println(param2);
+}else{
+System.out.println("Negative value");
+}}}`,
         after: `// Good example
-function wellFormattedFunction(param1, param2) {
-  if (param1 > param2) {
-    return true;
-  } else {
-    return false;
-  }
+public class WellFormattedClass {
+    public void wellFormattedMethod(int param1, String param2) {
+        if (param1 > 0) {
+            System.out.println(param2);
+        } else {
+            System.out.println("Negative value");
+        }
+    }
 }`,
     },
     {
@@ -469,18 +498,32 @@ function wellFormattedFunction(param1, param2) {
         title: 'Avoid Magic Numbers',
         content: 'Replace magic numbers with named constants to improve readability and maintainability.',
         before: `// Bad example
-if (user.age >= 18) {
-  console.log("User is an adult");
+public class Circle {
+    public double calculateArea(double radius) {
+        return 3.14159 * radius * radius;
+    }
 }
 
-const rectangleArea = width * 3.14159;`,
+public class AgeChecker {
+    public boolean isAdult(int age) {
+        return age >= 18;
+    }
+}`,
         after: `// Good example
-const ADULT_AGE = 18;
-if (user.age >= ADULT_AGE) {
-  console.log("User is an adult");
+public class Circle {
+    private static final double PI = 3.14159;
+
+    public double calculateArea(double radius) {
+        return PI * radius * radius;
+    }
 }
 
-const PI = 3.14159;
-const rectangleArea = width * PI;`,
+public class AgeChecker {
+    private static final int ADULT_AGE = 18;
+
+    public boolean isAdult(int age) {
+        return age >= ADULT_AGE;
+    }
+}`,
     },
 ];
