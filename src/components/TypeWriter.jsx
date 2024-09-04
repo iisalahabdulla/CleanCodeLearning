@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { nightOwl } from 'react-syntax-highlighter/dist/esm/styles/prism';
 const TypeWriter = ({ text, speed = 50, onTypingComplete, onLineTyped }) => {
     const [displayedText, setDisplayedText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,14 +28,24 @@ const TypeWriter = ({ text, speed = 50, onTypingComplete, onLineTyped }) => {
     }, [displayedText]);
 
     return (
-        <pre 
+        <div 
             ref={preRef}
-            className="p-4 font-mono text-sm bg-[#282a36] rounded-md text-white overflow-hidden transition-[height] duration-300 ease-in-out" 
-            style={{ lineHeight: '1.5', minHeight: '3rem' }}
+            className="overflow-hidden transition-[height] duration-300 ease-in-out" 
+            style={{ minHeight: '3rem' }}
         >
-            {displayedText}
-            {currentIndex < text.length && <span className="text-orange-500">▋</span>}
-        </pre>
+            <SyntaxHighlighter
+                language="java"
+                style={nightOwl}
+                customStyle={{
+                    // background: '#FFF',
+                    padding: '1rem',
+                    margin: 0,
+                    lineHeight: '1.5',
+                }}
+            >
+                {displayedText}
+            </SyntaxHighlighter>
+        </div>
     );
 };
 
