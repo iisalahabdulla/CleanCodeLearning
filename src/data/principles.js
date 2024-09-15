@@ -1,89 +1,96 @@
 export const principles = [
     {
         id: 1,
-        title: 'Meaningful names',
+        title: "Meaningful names",
         content:
-            'Use intention-revealing names. Choose names that reflect the purpose of the variable, function, or class.',
+            "Use specific, context-rich names for classes, methods, and variables. Choose names that precisely convey the purpose, meaning, and domain context of the code elements they represent, eliminating the need for clarifying comments.",
         before: `// Bad example
-public class Example {
-    public void process() {
-        int d; // elapsed time in days
-        if (d > 30) {
-            // do something
+    public class ProjectDuration {
+        public void process() {
+            int d; // elapsed time in days
+            if (d > 30) {
+                // do something
+            }
         }
-    }
-}`,
+    }`,
         after: `// Good example
-public class Example {
-    public void process() {
-        int elapsedTimeInDays;
-        if (elapsedTimeInDays > 30) {
-            // do something
+    public class ProjectDurationTracker {
+        public void checkForExtendedDuration() {
+            int projectDurationInDays;
+            final int STANDARD_PROJECT_DURATION = 30;
+            
+            if (projectDurationInDays > STANDARD_PROJECT_DURATION) {
+                // Handle extended duration
+            }
         }
-    }
-}`,
+    }`,
     },
     {
         id: 2,
-        title: 'Functions',
+        title: "Single Responsibility Functions",
         content:
-            'Keep functions small and focused on a single task. Aim for functions that are no more than 20 lines long.',
+            "Keep functions small and focused on a single task. This improves readability, testability, and maintainability. Use clear, concise names for classes and methods that indicate their role in the system.",
         before: `// Bad example
-public class DataProcessor {
-    public void processData(Data data) {
-        // 100 lines of code doing multiple things
-        // Validation
-        // Processing
-        // Saving
-        // Reporting
+public class OrderService {
+    public void processOrder(Order order) {
+        // Validate order
+        // Calculate total
+        // Apply discount
+        // Save to database
+        // Send confirmation email
     }
 }`,
         after: `// Good example
-public class DataProcessor {
-    public void processData(Data data) {
-        if (isValid(data)) {
-            Data processedData = transform(data);
-            save(processedData);
-            generateReport(processedData);
-        }
-    }
+public class OrderService {
+    private final ValidationService validationService;
+    private final PricingService pricingService;
+    private final DiscountService discountService;
+    private final DatabaseService databaseService;
+    private final EmailService emailService;
 
-    private boolean isValid(Data data) {
-        // Validation logic
-        return true;
+    public void processOrder(Order order) {
+        validationService.validate(order);
+        pricingService.calculateTotal(order);
+        discountService.applyDiscount(order);
+        databaseService.saveOrder(order);
+        emailService.sendConfirmation(order);
     }
+}
 
-    private Data transform(Data data) {
-        // Transformation logic
-        return data;
-    }
-
-    private void save(Data data) {
-        // Saving logic
-    }
-
-    private void generateReport(Data data) {
-        // Reporting logic
-    }
-}`,
+// Additional classes: ValidationService, PricingService, DiscountService, DatabaseService, EmailService
+`,
     },
     {
         id: 3,
-        title: 'Comments',
-        content: 'Use comments to explain intent and clarify complex logic, not to restate the obvious.',
+        title: "Effective Comments",
+        content:
+            "Use comments to explain intent, clarify complex logic, or provide context that isn't immediately obvious from the code. Avoid comments that merely restate what the code is doing.",
         before: `public class User {
-    // Calculate age
+    // Method to calculate age
     public int calculateAge(int currentYear, int birthYear) {
+        // Subtract birth year from current year
         return currentYear - birthYear;
     }
 
-    // Check if user is eligible for discount
+    // Method to check if user is eligible for discount
     public boolean isEligibleForDiscount(User user) {
+        // Check if total purchases are over 1000 and membership is gold
         if (user.getTotalPurchases() > 1000 && user.getMembershipLevel().equals("gold")) {
-            // Apply 10% discount
+            // User is eligible for discount
             return true;
         }
+        // User is not eligible for discount
         return false;
+    }
+
+    // Method to apply discount
+    public double applyDiscount(double price) {
+        // Define discount rate
+        double discountRate = 0.1;
+        // Calculate discounted price
+        double discountedPrice = price * (1 - discountRate);
+        // Return discounted price
+        return discountedPrice;
     }
 }`,
         after: `public class User {
@@ -91,114 +98,291 @@ public class DataProcessor {
         return currentYear - birthYear;
     }
 
-    // Users with over $1000 in purchases and gold membership get a 10% discount
     public boolean isEligibleForDiscount(User user) {
         return user.getTotalPurchases() > 1000 && user.getMembershipLevel().equals("gold");
     }
 
     public double applyDiscount(double price) {
+        // 10% discount for eligible users
         final double DISCOUNT_RATE = 0.1;
         return price * (1 - DISCOUNT_RATE);
+    }
+
+    /**
+     * Calculates the user's loyalty score based on their purchase history and account age.
+     * The score is used to determine eligibility for special promotions.
+     * 
+     * @param purchaseHistory List of user's past purchases
+     * @param accountAgeInYears Number of years the user has had an account
+     * @return Loyalty score between 0 and 100
+     */
+    public int calculateLoyaltyScore(List<Purchase> purchaseHistory, int accountAgeInYears) {
+        int score = 0;
+        
+        // Add 1 point for each year the account has been active, up to 5 points
+        score += Math.min(accountAgeInYears, 5);
+        
+        // Add points based on total purchase amount
+        double totalPurchaseAmount = purchaseHistory.stream()
+                                        .mapToDouble(Purchase::getAmount)
+                                        .sum();
+        score += Math.min((int)(totalPurchaseAmount / 100), 50);
+        
+        // Add bonus points for frequent purchases in the last year
+        long recentPurchases = purchaseHistory.stream()
+                                .filter(p -> p.getDate().isAfter(LocalDate.now().minusYears(1)))
+                                .count();
+        score += Math.min(recentPurchases * 2, 30);
+        
+        return Math.min(score, 100);  // Cap the score at 100
     }
 }`,
     },
     {
         id: 4,
         title: "DRY (Don't Repeat Yourself)",
-        content: 'Avoid duplicating code. Extract repeated logic into reusable functions or modules.',
-        before: `// Bad example
-public class Validator {
-    public boolean validateEmail(String email) {
-        String regex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
-        return email.matches(regex);
-    }
-
-    public boolean validateUsername(String username) {
-        String regex = "^[a-zA-Z0-9_]+$";
-        return username.matches(regex);
-    }
-
-    public boolean validatePassword(String password) {
-        String regex = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
-        return password.matches(regex);
-    }
-}`,
-        after: `// Good example
-public class Validator {
-    private static final String EMAIL_REGEX = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
-    private static final String USERNAME_REGEX = "^[a-zA-Z0-9_]+$";
-    private static final String PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
-
-    public boolean validate(String value, String regex) {
-        return value.matches(regex);
-    }
-
-    public boolean validateEmail(String email) {
-        return validate(email, EMAIL_REGEX);
-    }
-
-    public boolean validateUsername(String username) {
-        return validate(username, USERNAME_REGEX);
-    }
-
-    public boolean validatePassword(String password) {
-        return validate(password, PASSWORD_REGEX);
-    }
-}`,
-    },
-    {
-        id: 5,
-        title: 'Single Responsibility Principle',
         content:
-            'A class should have one, and only one, reason to change. This principle states that every module or class should have responsibility over a single part of the functionality provided by the software.',
-        before: `public class User {
-    private String name;
+            "Avoid duplicating code by extracting common logic into reusable functions or utilities. Balance this with maintaining clear, cohesive services. This improves maintainability, reduces errors, and makes code easier to update while keeping related functionality together.",
+        before: `// Bad example with code duplication
+public class UserService {
+    public void registerUser(String username, String email, String password) {
+        // Validate username
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Invalid username format");
+        }
 
-    public User(String name) {
-        this.name = name;
+        // Validate email
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        // Validate password
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+        if (!password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")) {
+            throw new IllegalArgumentException("Invalid password format");
+        }
+
+        saveUser(username, email, password);
     }
 
-    public void saveUser() {
-        // Save user to database
+    public void updateUserProfile(String username, String email) {
+        // Duplicate validation logic
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Invalid username format");
+        }
+
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        updateUser(username, email);
     }
 
-    public void sendEmail() {
-        // Send email to user
+    private void saveUser(String username, String email, String password) {
+        // Logic to save user to database
     }
 
-    public void generateReport() {
-        // Generate user report
+    private void updateUser(String username, String email) {
+        // Logic to update user in database
     }
 }`,
-        after: `public class User {
-    private String name;
+        after: `// Good example with balanced DRY approach
+public class UserService {
+    public void registerUser(String username, String email, String password) {
+        validateUsername(username);
+        validateEmail(email);
+        validatePassword(password);
 
-    public User(String name) {
-        this.name = name;
+        saveUser(username, email, password);
+    }
+
+    public void updateUserProfile(String username, String email) {
+        validateUsername(username);
+        validateEmail(email);
+
+        updateUser(username, email);
+    }
+
+    private void validateUsername(String username) {
+        ValidationUtils.validateNotEmpty(username, "Username");
+        ValidationUtils.validateFormat(username, ValidationPatterns.USERNAME_REGEX, "Invalid username format");
+    }
+
+    private void validateEmail(String email) {
+        ValidationUtils.validateNotEmpty(email, "Email");
+        ValidationUtils.validateFormat(email, ValidationPatterns.EMAIL_REGEX, "Invalid email format");
+    }
+
+    private void validatePassword(String password) {
+        ValidationUtils.validateNotEmpty(password, "Password");
+        ValidationUtils.validateFormat(password, ValidationPatterns.PASSWORD_REGEX, "Invalid password format");
+    }
+
+    private void saveUser(String username, String email, String password) {
+        // Logic to save user to database
+    }
+
+    private void updateUser(String username, String email) {
+        // Logic to update user in database
     }
 }
 
-public class UserPersistence {
-    public void saveUser(User user) {
-        // Save user to database
+public class ValidationUtils {
+    public static void validateNotEmpty(String value, String fieldName) {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " cannot be empty");
+        }
+    }
+
+    public static void validateFormat(String value, String regex, String errorMessage) {
+        if (!value.matches(regex)) {
+            throw new IllegalArgumentException(errorMessage);
+        }
     }
 }
 
-public class UserCommunication {
-    public void sendEmail(User user) {
-        // Send email to user
-    }
-}
-
-public class UserReporting {
-    public void generateReport(User user) {
-        // Generate user report
-    }
+public class ValidationPatterns {
+    public static final String USERNAME_REGEX = "^[a-zA-Z0-9_]+$";
+    public static final String EMAIL_REGEX = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
+    public static final String PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
 }`,
+    },{
+        id: 5,
+        title: "Single Responsibility Principle",
+        content:
+            "A class should have one, and only one, reason to change. This principle promotes focused, cohesive classes that are easier to maintain and understand.",
+        before: `// Violates SRP
+    public class Employee {
+        private String name;
+        private String email;
+    
+        public Employee(String name, String email) {
+            this.name = name;
+            this.email = email;
+        }
+    
+        public void save() {
+            // Save employee to database
+            System.out.println("Saving employee: " + name);
+        }
+    
+        public void sendEmail(String message) {
+            // Send email to employee
+            System.out.println("Sending email to: " + email);
+        }
+    
+        public String generateReport() {
+            // Generate employee report
+            return "Report for employee: " + name;
+        }
+    }
+    
+    // Usage
+    public class Main {
+        public static void main(String[] args) {
+            Employee employee = new Employee("John Doe", "john@example.com");
+            employee.save();
+            employee.sendEmail("Welcome aboard!");
+            String report = employee.generateReport();
+            System.out.println(report);
+        }
+    }`,
+        after: `// Follows SRP
+    public class Employee {
+        private String name;
+        private String email;
+    
+        public Employee(String name, String email) {
+            this.name = name;
+            this.email = email;
+        }
+    
+        public String getName() {
+            return name;
+        }
+    
+        public String getEmail() {
+            return email;
+        }
+    }
+    
+    public class EmployeeService {
+        private EmployeeRepository repository;
+        private EmailService emailService;
+        private ReportGenerator reportGenerator;
+    
+        public EmployeeService(EmployeeRepository repository, EmailService emailService, ReportGenerator reportGenerator) {
+            this.repository = repository;
+            this.emailService = emailService;
+            this.reportGenerator = reportGenerator;
+        }
+    
+        public void saveEmployee(Employee employee) {
+            repository.save(employee);
+        }
+    
+        public void sendWelcomeEmail(Employee employee) {
+            emailService.sendEmail(employee, "Welcome aboard!");
+        }
+    
+        public String generateEmployeeReport(Employee employee) {
+            return reportGenerator.generateReport(employee);
+        }
+    }
+    
+    public class EmployeeRepository {
+        public void save(Employee employee) {
+            System.out.println("Saving employee: " + employee.getName());
+        }
+    }
+    
+    public class EmailService {
+        public void sendEmail(Employee employee, String message) {
+            System.out.println("Sending email to: " + employee.getEmail());
+        }
+    }
+    
+    public class ReportGenerator {
+        public String generateReport(Employee employee) {
+            return "Report for employee: " + employee.getName();
+        }
+    }
+    
+    // Usage
+    public class Main {
+        public static void main(String[] args) {
+            EmployeeRepository repository = new EmployeeRepository();
+            EmailService emailService = new EmailService();
+            ReportGenerator reportGenerator = new ReportGenerator();
+            
+            EmployeeService employeeService = new EmployeeService(repository, emailService, reportGenerator);
+    
+            Employee employee = new Employee("John Doe", "john@example.com");
+            
+            employeeService.saveEmployee(employee);
+            employeeService.sendWelcomeEmail(employee);
+            String report = employeeService.generateEmployeeReport(employee);
+            System.out.println(report);
+        }
+    }`,
     },
     {
         id: 6,
-        title: 'Open-Closed Principle',
+        title: "Open-Closed Principle",
         content:
             "Software entities should be open for extension, but closed for modification. This means you should be able to extend a class's behavior without modifying it.",
         before: `public class Discount {
@@ -250,9 +434,9 @@ public class DiscountCalculator {
     },
     {
         id: 7,
-        title: 'Liskov Substitution Principle',
+        title: "Liskov Substitution Principle",
         content:
-            'Objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.',
+            "Objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.",
         before: `// Bad example - violates LSP
 public class Bird {
     public void fly() {
@@ -323,9 +507,9 @@ public class AnimalTest {
     },
     {
         id: 8,
-        title: 'Interface Segregation Principle',
+        title: "Interface Segregation Principle",
         content:
-            'No client should be forced to depend on methods it does not use. This principle aims at splitting interfaces that are very large into smaller and more specific ones.',
+            "No client should be forced to depend on methods it does not use. This principle aims at splitting interfaces that are very large into smaller and more specific ones.",
         before: `public interface Worker {
     void work();
     void eat();
@@ -367,9 +551,9 @@ public class Robot implements Workable {
     },
     {
         id: 9,
-        title: 'Dependency Inversion Principle',
+        title: "Dependency Inversion Principle",
         content:
-            'High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.',
+            "High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.",
         before: `class EmailSender {
     public void sendEmail(String message) {
         // Send email logic
@@ -425,8 +609,9 @@ class Main {
     },
     {
         id: 10,
-        title: 'Error Handling',
-        content: 'Use exceptions for error handling instead of return codes. Catch exceptions at the appropriate level.',
+        title: "Error Handling",
+        content:
+            "Use exceptions for error handling instead of return codes. Catch exceptions at the appropriate level.",
         before: `// Bad example
 public class Calculator {
     public int divide(int a, int b) {
@@ -472,8 +657,9 @@ public class Main {
     },
     {
         id: 11,
-        title: 'Code Formatting',
-        content: 'Maintain consistent code formatting. Use automated tools to enforce style guidelines.',
+        title: "Code Formatting",
+        content:
+            "Maintain consistent code formatting. Use automated tools to enforce style guidelines.",
         before: `// Bad example
 public class BadlyFormattedClass{
 public void badlyFormattedMethod(int param1,String param2){
@@ -495,8 +681,9 @@ public class WellFormattedClass {
     },
     {
         id: 12,
-        title: 'Avoid Magic Numbers',
-        content: 'Replace magic numbers with named constants to improve readability and maintainability.',
+        title: "Avoid Magic Numbers",
+        content:
+            "Replace magic numbers with named constants to improve readability and maintainability.",
         before: `// Bad example
 public class Circle {
     public double calculateArea(double radius) {

@@ -12,6 +12,11 @@ const CleanCodeLearning = () => {
   const containerRef = useRef(null);
   const activeTypewriterRef = useRef(null);
 
+  useEffect(() => {
+    // Add a CSS custom property for scroll margin
+    document.documentElement.style.setProperty('--scroll-margin-top', '50px');
+  }, []);
+
   const togglePrinciple = (id) => {
     setExpandedPrinciple(expandedPrinciple === id ? null : id);
     setShowAfter({});
@@ -21,7 +26,7 @@ const CleanCodeLearning = () => {
       setTimeout(() => {
         const element = principleRefs.current[id];
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
       }, 100);
     }
@@ -54,12 +59,24 @@ const CleanCodeLearning = () => {
     if (activeTypewriterRef.current && !userScrolled) {
       const rect = activeTypewriterRef.current.getBoundingClientRect();
       const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-      
+
       if (!isVisible) {
         activeTypewriterRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'center',
+          block: 'end',
+          inline: 'nearest'
         });
+        
+        // Calculate responsive scroll distance
+        const scrollDistance = Math.min(window.innerHeight * 0.2, 150);
+        
+        // Add a responsive bottom margin after scrolling
+        setTimeout(() => {
+          window.scrollBy({
+            top: scrollDistance,
+            behavior: 'smooth'
+          });
+        }, 100);
       }
     }
   };
@@ -78,7 +95,7 @@ const CleanCodeLearning = () => {
           {principles.map((principle) => (
             <li
               key={principle.id}
-              className="overflow-hidden bg-white rounded-lg shadow-lg"
+              className="overflow-hidden bg-white rounded-lg shadow-lg scrollmt-[var(--scroll-margin-top)]"
               ref={el => principleRefs.current[principle.id] = el}
             >
               <button
@@ -96,7 +113,7 @@ const CleanCodeLearning = () => {
                     <div ref={activeTypewriterRef} className="text-sm md:text-base">
                       <Typewriter
                         text={principle.before}
-                        speed={15}
+                        speed={5}
                         onTypingComplete={handleTypingComplete}
                         onLineTyped={handleLineTyped}
                       />
@@ -116,7 +133,7 @@ const CleanCodeLearning = () => {
                         <div ref={activeTypewriterRef} className="text-sm md:text-base">
                           <Typewriter
                             text={principle.after}
-                            speed={15}
+                            speed={5}
                             onTypingComplete={handleTypingComplete}
                             onLineTyped={handleLineTyped}
                           />
