@@ -26,7 +26,7 @@ const CleanCodeLearning = () => {
       setTimeout(() => {
         const element = principleRefs.current[id];
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 100);
     }
@@ -63,20 +63,10 @@ const CleanCodeLearning = () => {
       if (!isVisible) {
         activeTypewriterRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'end',
+          block: 'center',
           inline: 'nearest'
         });
-        
-        // Calculate responsive scroll distance
-        const scrollDistance = Math.min(window.innerHeight * 0.2, 150);
-        
-        // Add a responsive bottom margin after scrolling
-        setTimeout(() => {
-          window.scrollBy({
-            top: scrollDistance,
-            behavior: 'smooth'
-          });
-        }, 100);
+
       }
     }
   };
