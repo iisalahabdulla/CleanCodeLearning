@@ -38,10 +38,10 @@ const TypeWriter = ({ text, speed = 50, onTypingComplete, onLineTyped }) => {
                 language="java"
                 style={nightOwl}
                 customStyle={{
-                    padding: '1rem',
+                    padding: 'clamp(0.5rem, 2vw, 1.5rem)',
                     margin: 0,
                     lineHeight: '1.5',
-                    fontSize: 'clamp(0.7rem, 2vw, 1rem)',
+                    fontSize: 'clamp(0.6rem, 1.5vw, 1rem)',
                 }}
                 wrapLines={true}
                 wrapLongLines={true}

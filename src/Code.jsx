@@ -26,7 +26,7 @@ const CleanCodeLearning = () => {
       setTimeout(() => {
         const element = principleRefs.current[id];
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
       }, 100);
     }
@@ -58,15 +58,13 @@ const CleanCodeLearning = () => {
   const handleLineTyped = () => {
     if (activeTypewriterRef.current && !userScrolled) {
       const rect = activeTypewriterRef.current.getBoundingClientRect();
-      const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      const viewportHeight = window.innerHeight;
+      const bottomOffset = 100; // Adjust this value as needed
 
-      if (!isVisible) {
-        activeTypewriterRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        });
-
+      // Only scroll if the bottom of the content is below the viewport
+      if (rect.bottom > viewportHeight) {
+        const scrollAmount = rect.bottom - viewportHeight + bottomOffset;
+        window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
       }
     }
   };
